@@ -1,148 +1,99 @@
 #include <stdio.h>
-#include <string.h>
+#include <wchar.h>
+#include <locale.h>
 
-#define CHAR_ARRAY_SIZE 304
-#define INT_ARRAY_SIZE 25
-#define FLOAT_ARRAY_SIZE 25
-#define STUDENT_NUMBER 5
+#define CHAR_SIZE 304   // 0–303
+#define INT_SIZE 25
+#define FLOAT_SIZE 25
 
 int main() {
-    // Задание 1-2: Объявление массивов и вывод их содержимого
-    printf("=== Задание 1-2: Массивы ===\n\n");
-    
-    // Символьный массив
-    char charArray[CHAR_ARRAY_SIZE];
-    for (int i = 0; i < CHAR_ARRAY_SIZE; i++) {
-        charArray[i] = 'A' + (i % 26);
+    setlocale(LC_ALL, "");
+
+    // === 1–2. Объявление массивов ===
+    char charArray[CHAR_SIZE];
+    int intArray[INT_SIZE];
+    float floatArray[FLOAT_SIZE];
+
+    // Заполняем charArray символами ASCII (циклически 0–127)
+    for (int i = 0; i < CHAR_SIZE; i++) {
+        charArray[i] = (char)(i % 128);
     }
-    
-    printf("Символьный массив (размер %d) - таблица шириной 10:\n", CHAR_ARRAY_SIZE);
-    for (int i = 0; i < CHAR_ARRAY_SIZE; i++) {
-        printf("%3d - %c   ", i, charArray[i]);
-        if ((i + 1) % 10 == 0) {
-            printf("\n");
-        }
+
+    // Заполнение числовых массивов
+    for (int i = 0; i < INT_SIZE; i++)
+        intArray[i] = i + 1;
+
+    for (int i = 0; i < FLOAT_SIZE; i++)
+        floatArray[i] = (float)(i + 1) / 2;
+
+    // === Вывод числовых массивов ===
+    printf("=== Целочисленный массив ===\n");
+    for (int i = 0; i < INT_SIZE; i++)
+        printf("%2d - %d\n", i, intArray[i]);
+
+    printf("\n=== Вещественный массив ===\n");
+    for (int i = 0; i < FLOAT_SIZE; i++)
+        printf("%2d - %.2f\n", i, floatArray[i]);
+
+    // === Символьный массив (ASCII номер - символ) ===
+    printf("\n=== Символьный массив (ASCII номер - символ) ===\n");
+    for (int i = 0; i < CHAR_SIZE; i++) {
+        unsigned char c = charArray[i];
+        if (c >= 32 && c <= 126)
+            printf("%3u - %c\t", c, c);
+        else
+            printf("%3u - .\t", c);
+        if ((i + 1) % 5 == 0) printf("\n");
     }
-    printf("\n\n");
-    
-    // Целочисленный массив
-    int intArray[INT_ARRAY_SIZE];
-    for (int i = 0; i < INT_ARRAY_SIZE; i++) {
-        intArray[i] = i * 10;
-    }
-    
-    printf("Целочисленный массив (размер %d):\n", INT_ARRAY_SIZE);
-    for (int i = 0; i < INT_ARRAY_SIZE; i++) {
-        printf("%d - %d\n", i, intArray[i]);
-    }
+
+    // === 3. Работа с фамилией Рыбин ===
+    wchar_t surname_cyr1[] = L"Рыбин";                        // 3.1
+    wchar_t surname_cyr2[] = {L'Р', L'ы', L'б', L'и', L'н', L'\0'}; // 3.2
+    char surname_lat1[] = "Rybin";                            // 3.3
+    char surname_lat2[] = {'R','y','b','i','n','\0'};         // 3.4
+
+    // 3.5 Размеры строк
+    printf("\nРазмеры строк:\n");
+    wprintf(L"surname_cyr1: %lu байт\n", sizeof(surname_cyr1));
+    wprintf(L"surname_cyr2: %lu байт\n", sizeof(surname_cyr2));
+    printf("surname_lat1: %lu байт\n", sizeof(surname_lat1));
+    printf("surname_lat2: %lu байт\n", sizeof(surname_lat2));
+
+    // 3.6 Вывод строк
+    printf("\nВывод латиницей с %%s:\n");
+    printf("%s\n%s\n", surname_lat1, surname_lat2);
+
+    wprintf(L"\nВывод кириллицей с %%ls:\n");
+    wprintf(L"%ls\n%ls\n", surname_cyr1, surname_cyr2);
+
+    printf("\nВывод с %%c (латиница):\n");
+    for (int i = 0; surname_lat1[i] != '\0'; i++)
+        printf("%c ", surname_lat1[i]);
     printf("\n");
-    
-    // Вещественный массив
-    float floatArray[FLOAT_ARRAY_SIZE];
-    for (int i = 0; i < FLOAT_ARRAY_SIZE; i++) {
-        floatArray[i] = i * 0.5f;
-    }
-    
-    printf("Вещественный массив (размер %d):\n", FLOAT_ARRAY_SIZE);
-    for (int i = 0; i < FLOAT_ARRAY_SIZE; i++) {
-        printf("%d - %.2f\n", i, floatArray[i]);
-    }
+
+    wprintf(L"\nВывод с %%lc (кириллица):\n");
+    for (int i = 0; surname_cyr1[i] != L'\0'; i++)
+        wprintf(L"%lc ", surname_cyr1[i]);
+    wprintf(L"\n");
+
+    // 3.7 Дважды латиницей с \0
+    printf("\n3.7 Дважды латиницей с \\0:\n");
+    printf("%s%c%s\n", surname_lat1, '\0', surname_lat1);
+
+    // 3.8 Кириллица + латиница с \r
+    wprintf(L"\n3.8 Кириллица + латиница с \\r:\n");
+    wprintf(L"%ls\r%s\n", surname_cyr1, surname_lat1);
+
+    // 3.9 В кавычках
+    printf("\n3.9 В кавычках:\n");
+    printf("\"%s\"\n", surname_lat1);
+
+    // 3.10 Первые три буквы N раз
+    int N = 7;
+    printf("\n3.10 Первые три буквы %d раз:\n", N);
+    for (int i = 0; i < N; i++)
+        printf("%.3s ", surname_lat1);
     printf("\n");
-    
-    // Задание 3: Работа с символьными массивами фамилии
-    printf("=== Задание 3: Символьные массивы фамилии ===\n\n");
-    
-    // 3.1. Кириллицей непрерывно
-    char surname1[] = "Иванов";
-    
-    // 3.2. Кириллицей посимвольно (копируем из строки)
-    char temp[] = "Иванов";
-    char surname2[20];
-    int idx = 0;
-    for (int i = 0; temp[i] != '\0'; i++) {
-        surname2[idx++] = temp[i];
-    }
-    surname2[idx] = '\0';
-    
-    // 3.3. Латиницей непрерывно
-    char surname3[] = "Ivanov";
-    
-    // 3.4. Латиницей посимвольно
-    char surname4[] = {'I', 'v', 'a', 'n', 'o', 'v', '\0'};
-    
-    // 3.5. Вывод размеров строк
-    printf("3.5. Размеры строк:\n");
-    printf("Фамилия кириллицей непрерывно: %lu байт\n", sizeof(surname1));
-    printf("Фамилия кириллицей посимвольно: %lu байт\n", sizeof(surname2));
-    printf("Фамилия латиницей непрерывно: %lu байт\n", sizeof(surname3));
-    printf("Фамилия латиницей посимвольно: %lu байт\n", sizeof(surname4));
-    printf("\n");
-    
-    // 3.6. Вывод с помощью %s и %c
-    printf("3.6. Вывод строк:\n");
-    printf("Кириллица непрерывно (%s): ", "%s");
-    printf("%s\n", surname1);
-    printf("Кириллица непрерывно (%s): ", "%c");
-    for (int i = 0; surname1[i] != '\0'; i++) {
-        printf("%c", surname1[i]);
-    }
-    printf("\n");
-    
-    printf("Кириллица посимвольно (%s): ", "%s");
-    printf("%s\n", surname2);
-    printf("Кириллица посимвольно (%s): ", "%c");
-    for (int i = 0; surname2[i] != '\0'; i++) {
-        printf("%c", surname2[i]);
-    }
-    printf("\n");
-    
-    printf("Латиница непрерывно (%s): ", "%s");
-    printf("%s\n", surname3);
-    printf("Латиница непрерывно (%s): ", "%c");
-    for (int i = 0; surname3[i] != '\0'; i++) {
-        printf("%c", surname3[i]);
-    }
-    printf("\n");
-    
-    printf("Латиница посимвольно (%s): ", "%s");
-    printf("%s\n", surname4);
-    printf("Латиница посимвольно (%s): ", "%c");
-    for (int i = 0; surname4[i] != '\0'; i++) {
-        printf("%c", surname4[i]);
-    }
-    printf("\n\n");
-    
-    // 3.7. Фамилия латиницей дважды с \0 между ними
-    printf("3.7. Фамилия латиницей дважды с \\0 между ними:\n");
-    char surname_with_null[] = "Ivanov\0Ivanov";
-    printf("%s", surname_with_null);
-    for (int i = 0; i < 13; i++) {
-        if (surname_with_null[i] == '\0') {
-            printf("[\\0]");
-        } else {
-            printf("%c", surname_with_null[i]);
-        }
-    }
-    printf("\n\n");
-    
-    // 3.8. Кириллица, затем латиница с \r между ними
-    printf("3.8. Кириллица, затем латиница с \\r между ними:\n");
-    printf("%s\r%s\n", surname1, surname3);
-    printf("\n");
-    
-    // 3.9. Фамилия латиницей в двойных кавычках
-    printf("3.9. Фамилия латиницей в двойных кавычках:\n");
-    printf("\"%s\"\n", surname3);
-    printf("\n");
-    
-    // 3.10. Первые три буквы фамилии N раз
-    printf("3.10. Первые три буквы фамилии %d раз:\n", STUDENT_NUMBER);
-    for (int i = 0; i < STUDENT_NUMBER; i++) {
-        printf("%.3s ", surname3);
-    }
-    printf("\n\n");
-    
-    printf("=== Программа завершена ===\n");
-    
+
     return 0;
 }
